@@ -1,9 +1,12 @@
 Various programs to perform data transfer on as many network protocols as I could get to work.
 Warning: most of these are very lazily written!
-These programs are designed to accept an MPEG transport stream as their test payloads, which has a packet payload size of 1316.
+These programs are designed to accept an MPEG transport stream as their test payloads, which has a packet payload size of 1316. The "common protocol" between all of these is UDP.
+ 
 
-
-ipx_to_udp:
-udp_to_ipx: 
-atalk_to_udp:
-udp_to_atalk:
+ipx_to_udp: IPX datagrams -> UDP
+udp_to_ipx: UDP -> IPX datagrams
+atalk_to_udp: AppleTalk DDP (protocol number 0xFF) -> UDP
+udp_to_atalk: UDP -> AppleTalk DDP
+udp_to_dnet: UDP -> DECnet NSP session
+udp_to_ip: UDP -> IP ("raw socket")
+ip_to_udp: IP -> UDP ("raw socket")
