@@ -16,20 +16,24 @@
 int main(int argc, char** argv) {
     struct sockaddr_ipx ipx_addr;
     struct sockaddr_in udp_addr;
+    unsigned short ipx_port;
     int ipx_sock, udp_sock;
     char msg[BUFFER_SIZE];
     int len, rc;
     ssize_t sent_len;
-    const char* udp_ip = argv[1];
-    int udp_port = atoi(argv[2]);
+    const char* udp_ip;
+    int udp_port;
     char buffer[BUFFER_SIZE];
     int total_received = 0;
 
-    if (argc != 3) {
-        fprintf(stderr, "Usage: %s <UDP_IP> <UDP_PORT>\n", argv[0]);
+    if (argc != 4) {
+        fprintf(stderr, "Usage: %s <IPX port> <UDP address> <UDP port>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
 
+    ipx_port = strtol(argv[1], NULL, 16);
+    udp_ip = argv[2];
+    udp_port = atoi(argv[3]);
 
     ipx_sock = socket(AF_IPX, SOCK_DGRAM, 0);
     if (ipx_sock < 0) {
@@ -40,7 +44,7 @@ int main(int argc, char** argv) {
     memset(&ipx_addr, 0, sizeof(ipx_addr));
     ipx_addr.sipx_family = AF_IPX;
     ipx_addr.sipx_network = 0;
-    ipx_addr.sipx_port = htons(IPX_PORT);
+    ipx_addr.sipx_port = ipx_port;
     ipx_addr.sipx_type = 17;
 
     if (bind(ipx_sock, (struct sockaddr*) &ipx_addr, sizeof(ipx_addr)) < 0) {
