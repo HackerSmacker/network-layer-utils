@@ -26,7 +26,7 @@ int main(int argc, char** argv) {
     char buffer[BUFFER_SIZE];
     int total_received = 0;
 
-    if (argc != 4) {
+    if(argc != 4) {
         fprintf(stderr, "Usage: %s <IPX port> <UDP address> <UDP port>\n", argv[0]);
         exit(EXIT_FAILURE);
     }
@@ -36,7 +36,7 @@ int main(int argc, char** argv) {
     udp_port = atoi(argv[3]);
 
     ipx_sock = socket(AF_IPX, SOCK_DGRAM, 0);
-    if (ipx_sock < 0) {
+    if(ipx_sock < 0) {
         perror("IPX: socket: ");
         exit(EXIT_FAILURE);
     }
@@ -47,14 +47,14 @@ int main(int argc, char** argv) {
     ipx_addr.sipx_port = ipx_port;
     ipx_addr.sipx_type = 17;
 
-    if (bind(ipx_sock, (struct sockaddr*) &ipx_addr, sizeof(ipx_addr)) < 0) {
+    if(bind(ipx_sock, (struct sockaddr*) &ipx_addr, sizeof(ipx_addr)) < 0) {
         perror("IPX: bind: ");
         close(ipx_sock);
         exit(EXIT_FAILURE);
     }
 
     udp_sock = socket(AF_INET, SOCK_DGRAM, 0);
-    if (udp_sock < 0) {
+    if(udp_sock < 0) {
         perror("UDP: socket: ");
         close(ipx_sock);
         exit(EXIT_FAILURE);
@@ -63,7 +63,7 @@ int main(int argc, char** argv) {
     memset(&udp_addr, 0, sizeof(udp_addr));
     udp_addr.sin_family = AF_INET;
     udp_addr.sin_port = htons(udp_port);
-    if (inet_pton(AF_INET, udp_ip, &udp_addr.sin_addr) <= 0) {
+    if(inet_pton(AF_INET, udp_ip, &udp_addr.sin_addr) <= 0) {
         perror("UDP: inet_pton: ");
         close(ipx_sock);
         close(udp_sock);
@@ -74,21 +74,21 @@ int main(int argc, char** argv) {
     printf("Destination: %s:%d\n", udp_ip, udp_port);
 
 
-    while (1) {
+    while(1) {
         len = sizeof(ipx_addr);
         rc = recvfrom(ipx_sock, msg, sizeof(msg), 0, (struct sockaddr*) &ipx_addr, &len);
-        if (rc < 0) {
+        if(rc < 0) {
             perror("IPX: recvfrom: ");
             continue;
         }
 
-        if (total_received + rc <= BUFFER_SIZE) {
+        if(total_received + rc <= BUFFER_SIZE) {
             memcpy(buffer + total_received, msg, rc);
             total_received += rc;
 
-            if (total_received >= BUFFER_SIZE) {
+            if(total_received >= BUFFER_SIZE) {
                 sent_len = sendto(udp_sock, buffer, total_received, 0, (struct sockaddr*) &udp_addr, sizeof(udp_addr));
-                if (sent_len < 0) {
+                if(sent_len < 0) {
                     perror("UDP: sendto: ");
                 } 
 
