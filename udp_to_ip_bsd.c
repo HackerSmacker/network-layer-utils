@@ -12,6 +12,28 @@
 
 #define BUFFER_SIZE 1316 /* Packet payload size */
 
+unsigned short ip_checksum(unsigned short* addr, int len) {
+    int count_left = len;
+    unsigned short* current = addr;
+    unsigned int sum = 0;
+    unsigned short result = 0;
+
+    while(count_left > 1) {
+        sum += *current++;
+        count_left -= 2;
+    }
+
+    if(count_left == 1) {
+        *(unsigned char*) (&result) = *(unsigned char*) current;
+        sum += result;
+    }
+
+    sum = (sum >> 16) + (sum & 0xffff);
+    sum += (sum >> 16);
+    result = (unsigned short) ~sum;
+    return result;
+}
+
 int main(int argc, char** argv) {
     int udp_sock, raw_sock, udp_port, ip_proto;
     unsigned int src_addr;
@@ -80,6 +102,7 @@ int main(int argc, char** argv) {
     ip_hdr->ip_p = ip_proto;  // Protocol (e.g., ICMP or UDP)
     ip_hdr->ip_src.s_addr = src_addr;  // Source IP address
     ip_hdr->ip_dst.s_addr = raw_addr.sin_addr.s_addr;  // Destination IP address
+    ip_hdr->ip_sum = ip_checksum((unsigned short*) ip_hdr, sizeof(ip_hdr)); // Header checksum
 
     printf("Listening for UDP messages on port %d...\n", udp_port);
     printf("Destination address is %s with protocol %d\n", ip_addr, ip_proto);
@@ -90,7 +113,7 @@ int main(int argc, char** argv) {
             perror("UDP: recvfrom: ");
             continue;
         }
-
+ 
         total_received += recv_len;
 
         if(total_received >= BUFFER_SIZE) {

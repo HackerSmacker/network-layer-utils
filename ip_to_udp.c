@@ -7,9 +7,7 @@
 #include <errno.h>
 #include <unistd.h>
 #include <arpa/inet.h>
-#ifdef __linux__
 #include <linux/ip.h>
-#endif
 
 #define BUFFER_SIZE 1316 /* Packet payload size */
 
